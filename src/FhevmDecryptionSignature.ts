@@ -7,6 +7,71 @@ import {
 } from "./internal/eip1193";
 import { GenericStringStorage } from "./storage/GenericStringStorage";
 
+/**
+ * Check if the FhevmInstance has the required signing methods.
+ * These methods are available on the relayer-sdk instance but the types
+ * may not perfectly match our internal types.
+ * @internal
+ */
+function hasSigningMethods(instance: FhevmInstance): instance is FhevmInstance & {
+  createEIP712: (
+    publicKey: string,
+    contractAddresses: string[],
+    startTimestamp: number,
+    durationDays: number
+  ) => unknown;
+  generateKeypair: () => { publicKey: string; privateKey: string };
+} {
+  const inst = instance as unknown as Record<string, unknown>;
+  return typeof inst.createEIP712 === "function" && typeof inst.generateKeypair === "function";
+}
+
+/**
+ * Safely call createEIP712 and convert the result to our EIP712Type.
+ * The relayer-sdk returns a type with bigint chainId but we use number.
+ * @internal
+ */
+function callCreateEIP712(
+  instance: FhevmInstance,
+  publicKey: string,
+  contractAddresses: string[],
+  startTimestamp: number,
+  durationDays: number
+): EIP712Type {
+  if (!hasSigningMethods(instance)) {
+    throw new Error(
+      "FhevmInstance does not have createEIP712 method. " +
+        "Ensure you are using a compatible version of the relayer-sdk."
+    );
+  }
+
+  const result = instance.createEIP712(publicKey, contractAddresses, startTimestamp, durationDays);
+
+  // The relayer-sdk may return chainId as bigint, but we need number
+  // Convert the result to our expected EIP712Type format
+  const eip712 = result as unknown as {
+    domain: { chainId: number | bigint; name: string; verifyingContract: string; version: string };
+    message: Record<string, unknown>;
+    primaryType: string;
+    types: Record<string, { name: string; type: string }[]>;
+  };
+
+  return {
+    domain: {
+      chainId:
+        typeof eip712.domain.chainId === "bigint"
+          ? Number(eip712.domain.chainId)
+          : eip712.domain.chainId,
+      name: eip712.domain.name,
+      verifyingContract: eip712.domain.verifyingContract as `0x${string}`,
+      version: eip712.domain.version,
+    },
+    message: eip712.message as Record<string, EIP712Type["message"][string]>,
+    primaryType: eip712.primaryType,
+    types: eip712.types,
+  };
+}
+
 function _timestampNow(): number {
   return Math.floor(Date.now() / 1000);
 }
@@ -181,17 +246,49 @@ export class FhevmDecryptionSignature {
     };
   }
 
-  static fromJSON(json: unknown) {
+  /**
+   * Deserialize a FhevmDecryptionSignature from JSON.
+   * @param json - JSON string or parsed object
+   * @returns FhevmDecryptionSignature instance
+   * @throws TypeError if the JSON is invalid or doesn't match the expected schema
+   */
+  static fromJSON(json: unknown): FhevmDecryptionSignature {
+    // Type guard for BigInt serialization format
+    const isBigIntSerialized = (v: unknown): v is { __type: "bigint"; value: string } => {
+      if (!v || typeof v !== "object") return false;
+      const obj = v as Record<string, unknown>;
+      return obj.__type === "bigint" && typeof obj.value === "string";
+    };
+
     // Custom reviver to handle BigInt deserialization
     const reviver = (_key: string, value: unknown): unknown => {
-      if (value && typeof value === "object" && (value as any).__type === "bigint") {
-        return BigInt((value as any).value);
+      if (isBigIntSerialized(value)) {
+        return BigInt(value.value);
       }
       return value;
     };
 
-    const data = typeof json === "string" ? JSON.parse(json, reviver) : json;
-    return new FhevmDecryptionSignature(data as any);
+    // Parse if string, otherwise use as-is
+    let data: unknown;
+    try {
+      data = typeof json === "string" ? JSON.parse(json, reviver) : json;
+    } catch (parseError) {
+      throw new TypeError(
+        `Invalid JSON format for FhevmDecryptionSignature: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+      );
+    }
+
+    // Validate the parsed data using the existing type guard
+    if (!FhevmDecryptionSignature.checkIs(data)) {
+      throw new TypeError(
+        "Invalid FhevmDecryptionSignature data: missing or invalid required fields. " +
+          "Expected: publicKey, privateKey, signature, startTimestamp, durationDays, " +
+          "userAddress, contractAddresses, and eip712."
+      );
+    }
+
+    // Safe to construct - checkIs validates all required fields
+    return new FhevmDecryptionSignature(data);
   }
 
   equals(s: FhevmDecryptionSignatureType) {
@@ -292,7 +389,9 @@ export class FhevmDecryptionSignature {
       // Default to 1 day for security - developers can override
       const durationDays = 1;
 
-      const eip712 = (instance as any).createEIP712(
+      // Safely call createEIP712 with type conversion
+      const eip712 = callCreateEIP712(
+        instance,
         publicKey,
         contractAddresses,
         startTimestamp,
@@ -317,7 +416,7 @@ export class FhevmDecryptionSignature {
         startTimestamp,
         durationDays,
         signature,
-        eip712: eip712 as EIP712Type,
+        eip712,
         userAddress,
       });
     } catch (err) {
@@ -360,7 +459,26 @@ export class FhevmDecryptionSignature {
     }
 
     console.log("[FhevmDecryptionSignature] Generating new keypair...");
-    const { publicKey, privateKey } = keyPair ?? (instance as any).generateKeypair();
+
+    // Get keypair - either provided or generate new one
+    let publicKey: string;
+    let privateKey: string;
+
+    if (keyPair) {
+      publicKey = keyPair.publicKey;
+      privateKey = keyPair.privateKey;
+    } else {
+      // Validate instance has required methods
+      if (!hasSigningMethods(instance)) {
+        console.error(
+          "[FhevmDecryptionSignature] FhevmInstance does not have generateKeypair method"
+        );
+        return null;
+      }
+      const generated = instance.generateKeypair();
+      publicKey = generated.publicKey;
+      privateKey = generated.privateKey;
+    }
 
     const sig = await FhevmDecryptionSignature.new(
       instance,

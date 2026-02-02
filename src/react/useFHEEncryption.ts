@@ -9,6 +9,42 @@ export type EncryptResult = {
   inputProof: Uint8Array;
 };
 
+/**
+ * ABI input/output parameter definition.
+ * @internal
+ */
+interface AbiParameter {
+  name: string;
+  type: string;
+  indexed?: boolean;
+  components?: AbiParameter[];
+  internalType?: string;
+}
+
+/**
+ * ABI function definition.
+ * @internal
+ */
+interface AbiFunction {
+  type: "function";
+  name: string;
+  inputs: AbiParameter[];
+  outputs?: AbiParameter[];
+  stateMutability?: "pure" | "view" | "nonpayable" | "payable";
+}
+
+/**
+ * ABI item - can be function, event, error, constructor, etc.
+ * @internal
+ */
+type AbiItem =
+  | AbiFunction
+  | { type: "event"; name: string; inputs: AbiParameter[] }
+  | { type: "error"; name: string; inputs: AbiParameter[] }
+  | { type: "constructor"; inputs: AbiParameter[] }
+  | { type: "fallback" }
+  | { type: "receive" };
+
 // Map external encrypted integer type to RelayerEncryptedInput builder method
 export const getEncryptionMethod = (internalType: string) => {
   switch (internalType) {
@@ -43,22 +79,36 @@ export const toHex = (value: Uint8Array | string): `0x${string}` => {
   return ("0x" + Buffer.from(value).toString("hex")) as `0x${string}`;
 };
 
-// Build contract params from EncryptResult and ABI for a given function
-export const buildParamsFromAbi = (enc: EncryptResult, abi: any[], functionName: string): any[] => {
-  const fn = abi.find((item: any) => item.type === "function" && item.name === functionName);
+/**
+ * ABI parameter value - the possible types that can be passed to a contract function.
+ */
+type AbiParamValue = `0x${string}` | bigint | string | boolean;
+
+/**
+ * Build contract params from EncryptResult and ABI for a given function.
+ * @deprecated This function is part of the legacy encryption API.
+ */
+export const buildParamsFromAbi = (
+  enc: EncryptResult,
+  abi: readonly AbiItem[],
+  functionName: string
+): AbiParamValue[] => {
+  const fn = abi.find(
+    (item): item is AbiFunction => item.type === "function" && item.name === functionName
+  );
   if (!fn) throw new Error(`Function ABI not found for ${functionName}`);
 
-  return fn.inputs.map((input: any, index: number) => {
+  return fn.inputs.map((input: AbiParameter, index: number): AbiParamValue => {
     const raw = index === 0 ? enc.handles[0] : enc.inputProof;
     switch (input.type) {
       case "bytes32":
       case "bytes":
         return toHex(raw);
       case "uint256":
-        return BigInt(raw as unknown as string);
+        return BigInt(toHex(raw));
       case "address":
       case "string":
-        return raw as unknown as string;
+        return toHex(raw);
       case "bool":
         return Boolean(raw);
       default:

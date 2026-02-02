@@ -234,8 +234,10 @@ interface TfheParams {
 ### Short-term (Next PR)
 5. ✅ Phase 2.1 - Initialization timeout (FhevmProvider initTimeout prop)
 6. ✅ Phase 2.3 - RelayerSDKLoader retry (exponential backoff with jitter)
-7. Phase 1.1 - Storage security warnings
-8. Phase 4.1 - Standardize error handling
+7. ✅ Phase 3.3 - JSON Deserialization Validation (fromJSON with proper type guards)
+8. ✅ Removed `any` types from useFHEEncryption.ts (proper ABI typing)
+9. Phase 1.1 - Storage security warnings
+10. Phase 4.1 - Standardize error handling
 
 ### Medium-term (Future PRs)
 9. Phase 1.2 - CDN integrity checking
