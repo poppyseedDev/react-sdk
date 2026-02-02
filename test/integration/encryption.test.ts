@@ -15,23 +15,37 @@ const CONTRACT_ADDRESS = "0xabcdef1234567890abcdef1234567890abcdef12" as const;
  * Create a mock FHEVM instance that simulates encryption behavior.
  */
 function createMockFhevmInstanceForIntegration() {
+  // Track how many values have been added to the builder
+  let addCount = 0;
+
   const mockEncrypt = vi.fn().mockImplementation(async () => {
-    // Simulate realistic encrypt response
+    // Generate the correct number of handles based on how many values were added
+    const handles = Array.from({ length: addCount }, (_, i) =>
+      new Uint8Array(32).fill(0xaa + i)
+    );
+    // Reset counter for next encryption
+    addCount = 0;
     return {
-      handles: [new Uint8Array(32).fill(0xaa)],
+      handles,
       inputProof: new Uint8Array(64).fill(0xbb),
     };
   });
 
-  const mockBuilder = {
-    addBool: vi.fn().mockReturnThis(),
-    add8: vi.fn().mockReturnThis(),
-    add16: vi.fn().mockReturnThis(),
-    add32: vi.fn().mockReturnThis(),
-    add64: vi.fn().mockReturnThis(),
-    add128: vi.fn().mockReturnThis(),
-    add256: vi.fn().mockReturnThis(),
-    addAddress: vi.fn().mockReturnThis(),
+  // Helper to track additions and return this for chaining
+  const trackAdd = () => {
+    addCount++;
+    return mockBuilder;
+  };
+
+  const mockBuilder: Record<string, ReturnType<typeof vi.fn>> = {
+    addBool: vi.fn().mockImplementation(trackAdd),
+    add8: vi.fn().mockImplementation(trackAdd),
+    add16: vi.fn().mockImplementation(trackAdd),
+    add32: vi.fn().mockImplementation(trackAdd),
+    add64: vi.fn().mockImplementation(trackAdd),
+    add128: vi.fn().mockImplementation(trackAdd),
+    add256: vi.fn().mockImplementation(trackAdd),
+    addAddress: vi.fn().mockImplementation(trackAdd),
     encrypt: mockEncrypt,
   };
 
@@ -185,9 +199,11 @@ describe("Encryption Integration Tests", () => {
       await act(async () => {
         await result.current.encrypt(
           [
-            { type: "uint8", value: 255n },
-            { type: "uint16", value: 1000n },
-            { type: "uint32", value: 100000n },
+            // uint8/16/32 use number, converted to bigint internally
+            { type: "uint8", value: 255 },
+            { type: "uint16", value: 1000 },
+            { type: "uint32", value: 100000 },
+            // uint64/128/256 use bigint directly
             { type: "uint64", value: 10000000n },
             { type: "uint128", value: 10n ** 20n },
             { type: "uint256", value: 10n ** 30n },
@@ -196,9 +212,10 @@ describe("Encryption Integration Tests", () => {
         );
       });
 
-      expect(mockInstance._mockBuilder.add8).toHaveBeenCalledWith(255n);
-      expect(mockInstance._mockBuilder.add16).toHaveBeenCalledWith(1000n);
-      expect(mockInstance._mockBuilder.add32).toHaveBeenCalledWith(100000n);
+      // Verify the builder receives bigint values (converted from number for smaller types)
+      expect(mockInstance._mockBuilder.add8).toHaveBeenCalledWith(BigInt(255));
+      expect(mockInstance._mockBuilder.add16).toHaveBeenCalledWith(BigInt(1000));
+      expect(mockInstance._mockBuilder.add32).toHaveBeenCalledWith(BigInt(100000));
       expect(mockInstance._mockBuilder.add64).toHaveBeenCalledWith(10000000n);
       expect(mockInstance._mockBuilder.add128).toHaveBeenCalledWith(10n ** 20n);
       expect(mockInstance._mockBuilder.add256).toHaveBeenCalledWith(10n ** 30n);

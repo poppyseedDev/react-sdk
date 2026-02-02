@@ -1,10 +1,40 @@
 import type { FhevmInstance, FhevmInstanceConfig } from "../fhevmTypes";
 
+/**
+ * TFHE initialization parameters.
+ * These are passed to the TFHE library for cryptographic setup.
+ */
+export interface TfheInitParams {
+  /** WASM module URL override */
+  wasmUrl?: string;
+  /** Public key parameters */
+  publicKeyParams?: Uint8Array;
+  /** Additional TFHE configuration */
+  [key: string]: unknown;
+}
+
+/**
+ * KMS (Key Management Service) initialization parameters.
+ * These configure the connection to the key management service.
+ */
+export interface KmsInitParams {
+  /** KMS endpoint URL */
+  url?: string;
+  /** Authentication token */
+  authToken?: string;
+  /** Additional KMS configuration */
+  [key: string]: unknown;
+}
+
+/**
+ * Options for initializing the FHEVM SDK.
+ */
 export type FhevmInitSDKOptions = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tfheParams?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  kmsParams?: any;
+  /** TFHE cryptographic library parameters */
+  tfheParams?: TfheInitParams;
+  /** Key Management Service parameters */
+  kmsParams?: KmsInitParams;
+  /** Number of threads for WASM execution */
   thread?: number;
 };
 

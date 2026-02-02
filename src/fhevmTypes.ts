@@ -21,6 +21,23 @@ export type FhevmDecryptionSignatureType = {
   eip712: EIP712Type;
 };
 
+/**
+ * EIP-712 message value types.
+ * Values can be primitives, arrays, or nested objects.
+ */
+export type EIP712MessageValue =
+  | string
+  | number
+  | bigint
+  | boolean
+  | `0x${string}`
+  | Uint8Array
+  | EIP712MessageValue[]
+  | { [key: string]: EIP712MessageValue };
+
+/**
+ * EIP-712 typed data structure for signing.
+ */
 export type EIP712Type = {
   domain: {
     chainId: number;
@@ -29,7 +46,8 @@ export type EIP712Type = {
     version: string;
   };
 
-  message: any;
+  /** The message to sign. Structure varies based on primaryType. */
+  message: Record<string, EIP712MessageValue>;
   primaryType: string;
   types: {
     [key: string]: {

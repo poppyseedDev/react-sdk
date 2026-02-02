@@ -58,27 +58,44 @@ export interface UseEncryptReturn {
 }
 
 /**
- * Map FHE type name to the builder method on RelayerEncryptedInput.
- * @internal
- */
-const typeToBuilderMethod: Record<FheTypeName, keyof RelayerEncryptedInput> = {
-  bool: "addBool",
-  uint8: "add8",
-  uint16: "add16",
-  uint32: "add32",
-  uint64: "add64",
-  uint128: "add128",
-  uint256: "add256",
-  address: "addAddress",
-};
-
-/**
  * Add a value to the encryption builder based on its type.
+ * Uses type-safe dispatch based on the discriminated union.
  * @internal
  */
 function addToBuilder(builder: RelayerEncryptedInput, input: EncryptInput): void {
-  const method = typeToBuilderMethod[input.type];
-  (builder[method] as (value: unknown) => void)(input.value);
+  // Use discriminated union narrowing for type safety
+  switch (input.type) {
+    case "bool":
+      builder.addBool(input.value);
+      break;
+    case "uint8":
+      // uint8/16/32 accept number, convert to bigint for builder
+      builder.add8(BigInt(input.value));
+      break;
+    case "uint16":
+      builder.add16(BigInt(input.value));
+      break;
+    case "uint32":
+      builder.add32(BigInt(input.value));
+      break;
+    case "uint64":
+      builder.add64(input.value);
+      break;
+    case "uint128":
+      builder.add128(input.value);
+      break;
+    case "uint256":
+      builder.add256(input.value);
+      break;
+    case "address":
+      builder.addAddress(input.value);
+      break;
+    default: {
+      // Exhaustive check - TypeScript will error if a case is missed
+      const _exhaustive: never = input;
+      throw new Error(`Unknown encryption type: ${(_exhaustive as EncryptInput).type}`);
+    }
+  }
 }
 
 /**
@@ -145,6 +162,14 @@ export function useEncrypt(): UseEncryptReturn {
 
       // Encrypt and get result
       const result: EncryptedOutput = await builder.encrypt();
+
+      // Validate that encryption returned expected number of handles
+      if (result.handles.length !== inputs.length) {
+        throw new Error(
+          `Encryption mismatch: expected ${inputs.length} handles but got ${result.handles.length}. ` +
+            `This indicates a bug in the encryption process.`
+        );
+      }
 
       // Return as tuple: [...handles, proof]
       // Cast through unknown to satisfy TypeScript's strict tuple checking

@@ -121,64 +121,50 @@ export class FhevmDecryptionSignature {
     return this.#userAddress;
   }
 
+  /**
+   * Type guard to check if an unknown value is a valid FhevmDecryptionSignatureType.
+   * @param s - Value to check
+   * @returns True if the value is a valid signature type
+   */
   static checkIs(s: unknown): s is FhevmDecryptionSignatureType {
     if (!s || typeof s !== "object") {
       return false;
     }
-    if (!("publicKey" in s && typeof (s as any).publicKey === "string")) {
+
+    // Use type assertion once after initial check, then access properties safely
+    const obj = s as Record<string, unknown>;
+
+    // Check required string fields
+    if (typeof obj.publicKey !== "string") return false;
+    if (typeof obj.privateKey !== "string") return false;
+    if (typeof obj.signature !== "string") return false;
+
+    // Check required number fields
+    if (typeof obj.startTimestamp !== "number") return false;
+    if (typeof obj.durationDays !== "number") return false;
+
+    // Check userAddress
+    if (typeof obj.userAddress !== "string" || !obj.userAddress.startsWith("0x")) {
       return false;
     }
-    if (!("privateKey" in s && typeof (s as any).privateKey === "string")) {
-      return false;
+
+    // Check contractAddresses array
+    if (!Array.isArray(obj.contractAddresses)) return false;
+    for (const addr of obj.contractAddresses) {
+      if (typeof addr !== "string" || !addr.startsWith("0x")) {
+        return false;
+      }
     }
-    if (!("signature" in s && typeof (s as any).signature === "string")) {
-      return false;
-    }
-    if (!("startTimestamp" in s && typeof (s as any).startTimestamp === "number")) {
-      return false;
-    }
-    if (!("durationDays" in s && typeof (s as any).durationDays === "number")) {
-      return false;
-    }
-    if (!("contractAddresses" in s && Array.isArray((s as any).contractAddresses))) {
-      return false;
-    }
-    for (let i = 0; i < (s as any).contractAddresses.length; ++i) {
-      if (typeof (s as any).contractAddresses[i] !== "string") return false;
-      if (!((s as any).contractAddresses[i] as string).startsWith("0x")) return false;
-    }
-    if (
-      !(
-        "userAddress" in s &&
-        typeof (s as any).userAddress === "string" &&
-        (s as any).userAddress.startsWith("0x")
-      )
-    ) {
-      return false;
-    }
-    if (!("eip712" in s && typeof (s as any).eip712 === "object" && (s as any).eip712 !== null)) {
-      return false;
-    }
-    if (!("domain" in (s as any).eip712 && typeof (s as any).eip712.domain === "object")) {
-      return false;
-    }
-    if (
-      !("primaryType" in (s as any).eip712 && typeof (s as any).eip712.primaryType === "string")
-    ) {
-      return false;
-    }
-    if (!("message" in (s as any).eip712)) {
-      return false;
-    }
-    if (
-      !(
-        "types" in (s as any).eip712 &&
-        typeof (s as any).eip712.types === "object" &&
-        (s as any).eip712.types !== null
-      )
-    ) {
-      return false;
-    }
+
+    // Check eip712 object structure
+    if (!obj.eip712 || typeof obj.eip712 !== "object") return false;
+    const eip712 = obj.eip712 as Record<string, unknown>;
+
+    if (!eip712.domain || typeof eip712.domain !== "object") return false;
+    if (typeof eip712.primaryType !== "string") return false;
+    if (!("message" in eip712)) return false;
+    if (!eip712.types || typeof eip712.types !== "object") return false;
+
     return true;
   }
 

@@ -124,8 +124,11 @@ export async function publicKeyStorageGet(aclAddress: `0x${string}`): Promise<{
       assertFhevmStoredPublicKey(pk.value);
       storedPublicKey = pk.value;
     }
-  } catch {
-    //
+  } catch (error) {
+    // Log error but continue - cached data is optional
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[fhevm] Failed to read public key from IndexedDB:", error);
+    }
   }
 
   let storedPublicParams: FhevmStoredPublicParams | null = null;
@@ -135,8 +138,11 @@ export async function publicKeyStorageGet(aclAddress: `0x${string}`): Promise<{
       assertFhevmStoredPublicParams(pp.value);
       storedPublicParams = pp.value;
     }
-  } catch {
-    //
+  } catch (error) {
+    // Log error but continue - cached data is optional
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[fhevm] Failed to read public params from IndexedDB:", error);
+    }
   }
 
   const result: {

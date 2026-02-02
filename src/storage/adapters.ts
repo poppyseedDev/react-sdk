@@ -48,7 +48,11 @@ export const memoryStorage: GenericStringStorage = new MemoryStorage();
  * localStorage adapter.
  *
  * WARNING: Data persists across sessions and is accessible to any
- * JavaScript running on the same origin. Use with caution.
+ * JavaScript running on the same origin. Use with caution for sensitive data.
+ *
+ * @security Decryption signatures stored here are accessible to any script
+ * on the same origin. Consider using sessionStorageAdapter or memoryStorage
+ * for higher security requirements.
  */
 class LocalStorageAdapter implements GenericStringStorage {
   #prefix: string;
@@ -59,36 +63,44 @@ class LocalStorageAdapter implements GenericStringStorage {
 
   getItem(key: string): string | null {
     if (typeof window === "undefined") {
-      console.log("[LocalStorageAdapter] getItem - window undefined (SSR)");
       return null;
     }
-    const fullKey = this.#prefix + key;
-    const value = localStorage.getItem(fullKey);
-    console.log(
-      "[LocalStorageAdapter] getItem:",
-      fullKey,
-      "->",
-      value ? `${value.length} chars` : "null"
-    );
-    return value;
+    try {
+      return localStorage.getItem(this.#prefix + key);
+    } catch (error) {
+      // localStorage may be unavailable (private browsing, storage disabled)
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[fhevm] localStorage.getItem failed:", error);
+      }
+      return null;
+    }
   }
 
   setItem(key: string, value: string): void {
     if (typeof window === "undefined") {
-      console.log("[LocalStorageAdapter] setItem - window undefined (SSR)");
       return;
     }
-    const fullKey = this.#prefix + key;
-    console.log("[LocalStorageAdapter] setItem:", fullKey, "->", value.length, "chars");
-    localStorage.setItem(fullKey, value);
-    // Verify it was saved
-    const saved = localStorage.getItem(fullKey);
-    console.log("[LocalStorageAdapter] verified save:", saved ? "OK" : "FAILED");
+    try {
+      localStorage.setItem(this.#prefix + key, value);
+    } catch (error) {
+      // localStorage may be full or unavailable
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[fhevm] localStorage.setItem failed:", error);
+      }
+      // Re-throw quota exceeded errors so callers know storage failed
+      if (error instanceof DOMException && error.name === "QuotaExceededError") {
+        throw error;
+      }
+    }
   }
 
   removeItem(key: string): void {
     if (typeof window === "undefined") return;
-    localStorage.removeItem(this.#prefix + key);
+    try {
+      localStorage.removeItem(this.#prefix + key);
+    } catch {
+      // Ignore removal errors
+    }
   }
 }
 
