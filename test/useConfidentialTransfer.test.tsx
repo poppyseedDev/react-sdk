@@ -21,82 +21,73 @@ describe("useConfidentialTransfer", () => {
 
   describe("initial state", () => {
     it("should start with idle status", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });
 
     it("should start with isPending=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isPending).toBe(false);
     });
 
     it("should start with no error", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.error).toBeNull();
     });
 
     it("should start with no txHash", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.txHash).toBeUndefined();
     });
 
     it("should start with isEncrypting=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isEncrypting).toBe(false);
     });
 
     it("should start with isSigning=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isSigning).toBe(false);
     });
 
     it("should start with isConfirming=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isConfirming).toBe(false);
     });
 
     it("should start with isSuccess=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isSuccess).toBe(false);
     });
 
     it("should start with isError=false", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isError).toBe(false);
     });
@@ -104,19 +95,17 @@ describe("useConfidentialTransfer", () => {
 
   describe("transfer function", () => {
     it("should provide transfer function", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.transfer).toBe("function");
     });
 
     it("should set error when FHEVM not ready (disconnected)", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.transfer(recipientAddress, 100n);
@@ -128,10 +117,9 @@ describe("useConfidentialTransfer", () => {
     });
 
     it("should set error when FHEVM is initializing", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: InitializingWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: InitializingWrapper,
+      });
 
       await act(async () => {
         await result.current.transfer(recipientAddress, 100n);
@@ -144,19 +132,17 @@ describe("useConfidentialTransfer", () => {
 
   describe("reset function", () => {
     it("should provide reset function", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.reset).toBe("function");
     });
 
     it("should reset all state when called", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       // Trigger an error state
       await act(async () => {
@@ -181,10 +167,9 @@ describe("useConfidentialTransfer", () => {
     it("should call onError when transfer fails", async () => {
       const onError = vi.fn();
 
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress, onError }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress, onError }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         try {
@@ -200,10 +185,9 @@ describe("useConfidentialTransfer", () => {
 
   describe("status flags consistency", () => {
     it("should have mutually exclusive status states initially", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isPending).toBe(false);
       expect(result.current.isEncrypting).toBe(false);
@@ -214,10 +198,9 @@ describe("useConfidentialTransfer", () => {
     });
 
     it("should correctly set isError when error occurs", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.transfer(recipientAddress, 100n);
@@ -232,10 +215,9 @@ describe("useConfidentialTransfer", () => {
 
   describe("options handling", () => {
     it("should accept contractAddress only", () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });
@@ -274,10 +256,9 @@ describe("useConfidentialTransfer", () => {
 
   describe("memoization", () => {
     it("should maintain stable transfer function reference", () => {
-      const { result, rerender } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result, rerender } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       const firstTransfer = result.current.transfer;
       rerender();
@@ -287,10 +268,9 @@ describe("useConfidentialTransfer", () => {
     });
 
     it("should maintain stable reset function reference", () => {
-      const { result, rerender } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result, rerender } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       const firstReset = result.current.reset;
       rerender();
@@ -302,10 +282,9 @@ describe("useConfidentialTransfer", () => {
 
   describe("amount types", () => {
     it("should accept bigint amount", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       // Even though this will fail (disconnected), it should accept bigint
       await act(async () => {
@@ -316,10 +295,9 @@ describe("useConfidentialTransfer", () => {
     });
 
     it("should accept large bigint amounts", async () => {
-      const { result } = renderHook(
-        () => useConfidentialTransfer({ contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useConfidentialTransfer({ contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       const largeAmount = 10n ** 18n; // 1 with 18 zeros
 

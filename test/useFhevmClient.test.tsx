@@ -203,16 +203,10 @@ describe("useFhevmClient", () => {
       const contractAddress = "0x1234567890123456789012345678901234567890";
       const userAddress = "0xabcdef1234567890abcdef1234567890abcdef12";
 
-      const builder = result.current.instance?.createEncryptedInput(
-        contractAddress,
-        userAddress
-      );
+      const builder = result.current.instance?.createEncryptedInput(contractAddress, userAddress);
 
       expect(builder).toBe(mockBuilder);
-      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(
-        contractAddress,
-        userAddress
-      );
+      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(contractAddress, userAddress);
     });
   });
 });

@@ -71,9 +71,7 @@ describe("useEthersSigner", () => {
       // Wait for async initialization
       await waitFor(() => {
         // Either it sets an error (no provider) or succeeds (mock provider)
-        expect(
-          result.current.error !== undefined || result.current.isLoading === false
-        ).toBe(true);
+        expect(result.current.error !== undefined || result.current.isLoading === false).toBe(true);
       });
     });
 

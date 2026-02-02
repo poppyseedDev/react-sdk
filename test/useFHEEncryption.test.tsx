@@ -130,10 +130,7 @@ describe("useFHEEncryption", () => {
         builder.add64(100n);
       });
 
-      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(
-        contractAddress,
-        TEST_ADDRESS
-      );
+      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(contractAddress, TEST_ADDRESS);
       expect(mockBuilder.add64).toHaveBeenCalledWith(100n);
       expect(mockEncrypt).toHaveBeenCalled();
       expect(encrypted).toBeDefined();

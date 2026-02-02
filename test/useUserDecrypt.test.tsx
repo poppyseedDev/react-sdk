@@ -37,53 +37,46 @@ describe("useUserDecrypt", () => {
 
   describe("canDecrypt", () => {
     it("should return false when not connected", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       expect(result.current.canDecrypt).toBe(false);
     });
 
     it("should return false when initializing", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: InitializingWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: InitializingWrapper,
+      });
 
       expect(result.current.canDecrypt).toBe(false);
     });
 
     it("should return false when no handle provided", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle: undefined, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle: undefined, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.canDecrypt).toBe(false);
     });
 
     it("should return false when no contractAddress provided", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress: undefined }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress: undefined }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.canDecrypt).toBe(false);
     });
 
     it("should return true when ready with valid params", () => {
       const mockProvider = createMockEip1193Provider();
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        {
-          wrapper: createTestWrapper({
-            status: "ready",
-            isConnected: true,
-            provider: mockProvider,
-          }),
-        }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: createTestWrapper({
+          status: "ready",
+          isConnected: true,
+          provider: mockProvider,
+        }),
+      });
 
       expect(result.current.canDecrypt).toBe(true);
     });
@@ -91,46 +84,41 @@ describe("useUserDecrypt", () => {
 
   describe("initial state", () => {
     it("should start with empty results", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.results).toEqual({});
     });
 
     it("should start with isDecrypting=false", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isDecrypting).toBe(false);
     });
 
     it("should start with isIdle=true", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isIdle).toBe(true);
     });
 
     it("should start with no error", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.error).toBeNull();
     });
 
     it("should start with empty message", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.message).toBe("");
     });
@@ -138,10 +126,9 @@ describe("useUserDecrypt", () => {
 
   describe("decrypt function", () => {
     it("should do nothing when canDecrypt is false", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle: undefined, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle: undefined, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       act(() => {
         result.current.decrypt();
@@ -181,10 +168,9 @@ describe("useUserDecrypt", () => {
 
   describe("clearError", () => {
     it("should provide clearError function", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.clearError).toBe("function");
     });
@@ -192,10 +178,9 @@ describe("useUserDecrypt", () => {
 
   describe("status flags", () => {
     it("should have mutually exclusive status flags initially", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       // Initially should be idle
       expect(result.current.isIdle).toBe(true);
@@ -207,10 +192,9 @@ describe("useUserDecrypt", () => {
 
   describe("message states", () => {
     it("should return empty message when idle", () => {
-      const { result } = renderHook(
-        () => useUserDecrypt({ handle, contractAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUserDecrypt({ handle, contractAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.message).toBe("");
     });
@@ -231,16 +215,13 @@ describe("useUserDecrypt", () => {
     it("should normalize single params to array internally", () => {
       const singleParams = { handle, contractAddress };
 
-      const { result: singleResult } = renderHook(
-        () => useUserDecrypt(singleParams),
-        {
-          wrapper: createTestWrapper({
-            status: "ready",
-            isConnected: true,
-            provider: createMockEip1193Provider(),
-          }),
-        }
-      );
+      const { result: singleResult } = renderHook(() => useUserDecrypt(singleParams), {
+        wrapper: createTestWrapper({
+          status: "ready",
+          isConnected: true,
+          provider: createMockEip1193Provider(),
+        }),
+      });
 
       expect(singleResult.current.canDecrypt).toBe(true);
     });
@@ -248,16 +229,13 @@ describe("useUserDecrypt", () => {
     it("should handle array with single item same as single params", () => {
       const arrayParams = [{ handle, contractAddress }];
 
-      const { result: arrayResult } = renderHook(
-        () => useUserDecrypt(arrayParams),
-        {
-          wrapper: createTestWrapper({
-            status: "ready",
-            isConnected: true,
-            provider: createMockEip1193Provider(),
-          }),
-        }
-      );
+      const { result: arrayResult } = renderHook(() => useUserDecrypt(arrayParams), {
+        wrapper: createTestWrapper({
+          status: "ready",
+          isConnected: true,
+          provider: createMockEip1193Provider(),
+        }),
+      });
 
       expect(arrayResult.current.canDecrypt).toBe(true);
     });

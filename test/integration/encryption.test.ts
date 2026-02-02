@@ -51,7 +51,9 @@ function createMockFhevmInstanceForIntegration() {
 /**
  * Create an integration test wrapper with mock FHEVM context.
  */
-function createIntegrationWrapper(instance: ReturnType<typeof createMockFhevmInstanceForIntegration>) {
+function createIntegrationWrapper(
+  instance: ReturnType<typeof createMockFhevmInstanceForIntegration>
+) {
   const config = createFhevmConfig({ chains: [hardhatLocal] });
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -131,7 +133,10 @@ describe("Encryption Integration Tests", () => {
 
       expect(encrypted).toBeDefined();
       expect(encrypted).toHaveLength(2); // [handle, proof]
-      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(CONTRACT_ADDRESS, TEST_ADDRESS);
+      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(
+        CONTRACT_ADDRESS,
+        TEST_ADDRESS
+      );
       expect(mockInstance._mockBuilder.add64).toHaveBeenCalledWith(100n);
     });
 
@@ -248,7 +253,10 @@ describe("Encryption Integration Tests", () => {
 
       let encrypted: Awaited<ReturnType<typeof result.current.encrypt>>;
       await act(async () => {
-        encrypted = await result.current.encrypt([{ type: "uint64", value: 100n }], CONTRACT_ADDRESS);
+        encrypted = await result.current.encrypt(
+          [{ type: "uint64", value: 100n }],
+          CONTRACT_ADDRESS
+        );
       });
 
       expect(encrypted).toBeUndefined();
@@ -269,10 +277,7 @@ describe("Encryption Integration Tests", () => {
     it("should encrypt multiple values with single proof", async () => {
       // Update mock to return multiple handles
       mockInstance._mockEncrypt.mockResolvedValueOnce({
-        handles: [
-          new Uint8Array(32).fill(0x11),
-          new Uint8Array(32).fill(0x22),
-        ],
+        handles: [new Uint8Array(32).fill(0x11), new Uint8Array(32).fill(0x22)],
         inputProof: new Uint8Array(64).fill(0xcc),
       });
 

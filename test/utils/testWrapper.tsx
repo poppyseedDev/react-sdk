@@ -56,8 +56,7 @@ export function createTestWrapper(options: TestWrapperOptions = {}) {
     instance ?? (status === "ready" ? createMockFhevmInstance() : undefined);
 
   // Create mock provider if not provided and connected
-  const effectiveProvider =
-    provider ?? (isConnected ? createMockEip1193Provider() : undefined);
+  const effectiveProvider = provider ?? (isConnected ? createMockEip1193Provider() : undefined);
 
   const config = createFhevmConfig({ chains: [hardhatLocal] });
 
@@ -91,9 +90,7 @@ export function createTestWrapper(options: TestWrapperOptions = {}) {
   return function TestWrapper({ children }: { children: ReactNode }) {
     return (
       <FhevmContext.Provider value={contextValue}>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       </FhevmContext.Provider>
     );
   };

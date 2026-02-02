@@ -1,4 +1,9 @@
-import type { FhevmInstance as _FhevmInstance , HandleContractPair as _HandleContractPair , UserDecryptResults as _UserDecryptResults , FhevmInstanceConfig as _FhevmInstanceConfig } from "@zama-fhe/relayer-sdk/bundle";
+import type {
+  FhevmInstance as _FhevmInstance,
+  HandleContractPair as _HandleContractPair,
+  UserDecryptResults as _UserDecryptResults,
+  FhevmInstanceConfig as _FhevmInstanceConfig,
+} from "@zama-fhe/relayer-sdk/bundle";
 
 export type FhevmInstance = _FhevmInstance;
 export type FhevmInstanceConfig = _FhevmInstanceConfig;

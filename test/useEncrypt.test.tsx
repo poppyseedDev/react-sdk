@@ -93,10 +93,7 @@ describe("useEncrypt", () => {
         contractAddress
       );
 
-      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(
-        contractAddress,
-        TEST_ADDRESS
-      );
+      expect(mockInstance.createEncryptedInput).toHaveBeenCalledWith(contractAddress, TEST_ADDRESS);
       expect(mockBuilder.add64).toHaveBeenCalledWith(100n);
       expect(mockEncrypt).toHaveBeenCalled();
       expect(encrypted).toEqual(["0xhandle1", "0xproof"]);

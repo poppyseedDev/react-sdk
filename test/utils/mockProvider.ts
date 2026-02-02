@@ -23,9 +23,7 @@ export function createMockEip1193Provider(
 ): Eip1193Provider {
   const chainId = overrides.chainId ?? TEST_CHAIN_ID;
   const accounts = overrides.accounts ?? [TEST_ADDRESS];
-  const signatureResponse =
-    overrides.signatureResponse ??
-    "0x" + "ab".repeat(65); // 130 hex chars = 65 bytes
+  const signatureResponse = overrides.signatureResponse ?? "0x" + "ab".repeat(65); // 130 hex chars = 65 bytes
 
   return {
     request: vi.fn().mockImplementation(async ({ method, params }) => {

@@ -20,100 +20,89 @@ describe("useUnshield", () => {
 
   describe("initial state", () => {
     it("should start with idle status", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });
 
     it("should start with isPending=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isPending).toBe(false);
     });
 
     it("should start with no error", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.error).toBeNull();
     });
 
     it("should start with no txHash", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.txHash).toBeUndefined();
     });
 
     it("should start with no finalizeTxHash", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.finalizeTxHash).toBeUndefined();
     });
 
     it("should start with isEncrypting=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isEncrypting).toBe(false);
     });
 
     it("should start with isSigning=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isSigning).toBe(false);
     });
 
     it("should start with isDecrypting=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isDecrypting).toBe(false);
     });
 
     it("should start with isFinalizing=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isFinalizing).toBe(false);
     });
 
     it("should start with isSuccess=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isSuccess).toBe(false);
     });
 
     it("should start with isError=false", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isError).toBe(false);
     });
@@ -121,19 +110,17 @@ describe("useUnshield", () => {
 
   describe("unshield function", () => {
     it("should provide unshield function", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.unshield).toBe("function");
     });
 
     it("should set error when FHEVM not ready (disconnected)", async () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.unshield(100n);
@@ -145,10 +132,9 @@ describe("useUnshield", () => {
     });
 
     it("should set error when FHEVM is initializing", async () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: InitializingWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: InitializingWrapper,
+      });
 
       await act(async () => {
         await result.current.unshield(100n);
@@ -161,19 +147,17 @@ describe("useUnshield", () => {
 
   describe("reset function", () => {
     it("should provide reset function", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.reset).toBe("function");
     });
 
     it("should reset all state when called", async () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       // Trigger an error state
       await act(async () => {
@@ -199,10 +183,9 @@ describe("useUnshield", () => {
     it("should call onError when unshield fails", async () => {
       const onError = vi.fn();
 
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress, onError }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress, onError }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.unshield(100n);
@@ -214,10 +197,9 @@ describe("useUnshield", () => {
 
   describe("status flags consistency", () => {
     it("should have mutually exclusive status states initially", () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isPending).toBe(false);
       expect(result.current.isEncrypting).toBe(false);
@@ -229,10 +211,9 @@ describe("useUnshield", () => {
     });
 
     it("should correctly set isError when error occurs", async () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.unshield(100n);
@@ -247,10 +228,9 @@ describe("useUnshield", () => {
 
   describe("memoization", () => {
     it("should maintain stable unshield function reference", () => {
-      const { result, rerender } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result, rerender } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       const firstUnshield = result.current.unshield;
       rerender();
@@ -260,10 +240,9 @@ describe("useUnshield", () => {
     });
 
     it("should maintain stable reset function reference", () => {
-      const { result, rerender } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result, rerender } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       const firstReset = result.current.reset;
       rerender();
@@ -275,10 +254,9 @@ describe("useUnshield", () => {
 
   describe("recipient handling", () => {
     it("should accept optional recipient address", async () => {
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       const recipientAddress = "0x9876543210987654321098765432109876543210" as const;
 

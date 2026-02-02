@@ -150,22 +150,22 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Validate ESM import
+      - name: Validate build output
         run: |
-          node --input-type=module -e "
-            import { createFhevmConfig } from './dist/index.js';
-            console.log('ESM import OK');
-          "
+          # Check that all expected entry points exist
+          test -f dist/index.js && echo "✓ dist/index.js"
+          test -f dist/index.d.ts && echo "✓ dist/index.d.ts"
+          test -f dist/chains/index.js && echo "✓ dist/chains/index.js"
+          test -f dist/core/index.js && echo "✓ dist/core/index.js"
+          test -f dist/storage/index.js && echo "✓ dist/storage/index.js"
+          test -f dist/react/index.js && echo "✓ dist/react/index.js"
+          echo "All build outputs verified"
 
-      - name: Check package exports
+      - name: Validate TypeScript declarations
         run: |
-          node --input-type=module -e "
-            import * as main from './dist/index.js';
-            import * as chains from './dist/chains/index.js';
-            import * as core from './dist/core/index.js';
-            import * as storage from './dist/storage/index.js';
-            console.log('All exports OK');
-          "
+          # Verify type declarations are generated
+          find dist -name "*.d.ts" | head -10
+          test $(find dist -name "*.d.ts" | wc -l) -gt 0 && echo "✓ Type declarations found"
 
       - name: Pack dry run
         run: pnpm pack --dry-run

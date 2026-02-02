@@ -21,73 +21,65 @@ describe("useShield", () => {
 
   describe("initial state", () => {
     it("should start with idle status", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });
 
     it("should start with isPending=false", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isPending).toBe(false);
     });
 
     it("should start with no error", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.error).toBeNull();
     });
 
     it("should start with no txHash", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.txHash).toBeUndefined();
     });
 
     it("should start with isApproving=false", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isApproving).toBe(false);
     });
 
     it("should start with isWrapping=false", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isWrapping).toBe(false);
     });
 
     it("should start with isSuccess=false", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isSuccess).toBe(false);
     });
 
     it("should start with isError=false", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.isError).toBe(false);
     });
@@ -95,19 +87,17 @@ describe("useShield", () => {
 
   describe("shield function", () => {
     it("should provide shield function", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.shield).toBe("function");
     });
 
     it("should set error when not connected", async () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.shield(100n);
@@ -120,19 +110,17 @@ describe("useShield", () => {
 
   describe("reset function", () => {
     it("should provide reset function", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.reset).toBe("function");
     });
 
     it("should reset state when called", async () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       // Trigger an error state
       await act(async () => {
@@ -154,10 +142,9 @@ describe("useShield", () => {
 
   describe("refetchAllowance function", () => {
     it("should provide refetchAllowance function", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(typeof result.current.refetchAllowance).toBe("function");
     });
@@ -182,10 +169,9 @@ describe("useShield", () => {
 
   describe("status flags consistency", () => {
     it("should have mutually exclusive status states initially", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       // All should be false except idle
       expect(result.current.isPending).toBe(false);
@@ -196,10 +182,9 @@ describe("useShield", () => {
     });
 
     it("should correctly set isError when error occurs", async () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: DisconnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: DisconnectedWrapper,
+      });
 
       await act(async () => {
         await result.current.shield(100n);
@@ -214,19 +199,17 @@ describe("useShield", () => {
 
   describe("props handling", () => {
     it("should accept wrapperAddress only (fetches underlying)", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });
 
     it("should accept both wrapperAddress and underlyingAddress", () => {
-      const { result } = renderHook(
-        () => useShield({ wrapperAddress, underlyingAddress }),
-        { wrapper: ConnectedWrapper }
-      );
+      const { result } = renderHook(() => useShield({ wrapperAddress, underlyingAddress }), {
+        wrapper: ConnectedWrapper,
+      });
 
       expect(result.current.status).toBe("idle");
     });

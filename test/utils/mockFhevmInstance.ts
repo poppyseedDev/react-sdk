@@ -12,9 +12,7 @@ export const MOCK_HANDLE = "0x" + "11".repeat(32);
  * This mock provides sensible defaults for all methods while allowing
  * individual methods to be overridden or spied upon.
  */
-export function createMockFhevmInstance(
-  overrides: Partial<FhevmInstance> = {}
-): FhevmInstance {
+export function createMockFhevmInstance(overrides: Partial<FhevmInstance> = {}): FhevmInstance {
   const mockPublicKey = new Uint8Array(32).fill(1);
   const mockPublicParams = new Uint8Array(64).fill(2);
   const mockPrivateKey = new Uint8Array(32).fill(3);
@@ -57,9 +55,7 @@ export function createMockFhevmInstance(
 
   return {
     // Encryption
-    createEncryptedInput: vi
-      .fn()
-      .mockReturnValue(mockEncryptedInputBuilder),
+    createEncryptedInput: vi.fn().mockReturnValue(mockEncryptedInputBuilder),
 
     // Decryption
     userDecrypt: vi.fn().mockResolvedValue({
@@ -96,9 +92,7 @@ export function createFailingFhevmInstance(
 
   for (const method of failingMethods) {
     if (typeof baseInstance[method] === "function") {
-      (baseInstance[method] as ReturnType<typeof vi.fn>) = vi
-        .fn()
-        .mockRejectedValue(error);
+      (baseInstance[method] as ReturnType<typeof vi.fn>) = vi.fn().mockRejectedValue(error);
     }
   }
 

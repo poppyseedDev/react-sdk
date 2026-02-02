@@ -34,8 +34,8 @@ function createMockFhevmInstanceForDecryption() {
     }
     return {
       clearValues,
-      abiEncodedClearValues: "0x" + "00".repeat(32) as `0x${string}`,
-      decryptionProof: "0x" + "ff".repeat(64) as `0x${string}`,
+      abiEncodedClearValues: ("0x" + "00".repeat(32)) as `0x${string}`,
+      decryptionProof: ("0x" + "ff".repeat(64)) as `0x${string}`,
     };
   });
 
@@ -131,10 +131,9 @@ describe("Decryption Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForDecryption();
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       expect(result.current.canDecrypt).toBe(true);
       expect(result.current.isIdle).toBe(true);
@@ -178,10 +177,9 @@ describe("Decryption Integration Tests", () => {
       mockInstance.publicDecrypt.mockRejectedValueOnce(new Error("Decryption failed"));
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       await act(async () => {
         result.current.decrypt();
@@ -198,10 +196,9 @@ describe("Decryption Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForDecryption();
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       let decryptResult: Awaited<ReturnType<typeof result.current.decryptAsync>>;
 
@@ -242,10 +239,9 @@ describe("Decryption Integration Tests", () => {
       mockInstance.publicDecrypt.mockRejectedValueOnce(new Error("Test error"));
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       await act(async () => {
         result.current.decrypt();
@@ -345,19 +341,25 @@ describe("Decryption Integration Tests", () => {
 
       // Add delay to publicDecrypt
       mockInstance.publicDecrypt.mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({
-          clearValues: { [MOCK_HANDLE]: 100n },
-          abiEncodedClearValues: "0x" + "00".repeat(32),
-          decryptionProof: "0x" + "ff".repeat(64),
-        }), 200))
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  clearValues: { [MOCK_HANDLE]: 100n },
+                  abiEncodedClearValues: "0x" + "00".repeat(32),
+                  decryptionProof: "0x" + "ff".repeat(64),
+                }),
+              200
+            )
+          )
       );
 
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       // Start decrypt
       act(() => {
@@ -384,19 +386,25 @@ describe("Decryption Integration Tests", () => {
 
       // Add delay to publicDecrypt
       mockInstance.publicDecrypt.mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({
-          clearValues: { [MOCK_HANDLE]: 100n },
-          abiEncodedClearValues: "0x" + "00".repeat(32),
-          decryptionProof: "0x" + "ff".repeat(64),
-        }), 200))
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  clearValues: { [MOCK_HANDLE]: 100n },
+                  abiEncodedClearValues: "0x" + "00".repeat(32),
+                  decryptionProof: "0x" + "ff".repeat(64),
+                }),
+              200
+            )
+          )
       );
 
       const wrapper = createDecryptionWrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => usePublicDecrypt({ handles: [MOCK_HANDLE] }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => usePublicDecrypt({ handles: [MOCK_HANDLE] }), {
+        wrapper,
+      });
 
       // Start first decrypt
       act(() => {

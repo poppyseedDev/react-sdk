@@ -164,10 +164,7 @@ describe("ERC7984 Integration Tests", () => {
       const { result } = renderHook(
         () =>
           useConfidentialBalances({
-            contracts: [
-              { contractAddress: TOKEN_ADDRESS },
-              { contractAddress: secondToken },
-            ],
+            contracts: [{ contractAddress: TOKEN_ADDRESS }, { contractAddress: secondToken }],
             enabled: false,
           }),
         { wrapper }
@@ -394,10 +391,9 @@ describe("ERC7984 Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForERC7984();
       const wrapper = createERC7984Wrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }), {
+        wrapper,
+      });
 
       expect(result.current.status).toBe("idle");
       expect(result.current.isPending).toBe(false);
@@ -411,10 +407,9 @@ describe("ERC7984 Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForERC7984();
       const wrapper = createERC7984Wrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }), {
+        wrapper,
+      });
 
       expect(typeof result.current.unshield).toBe("function");
     });
@@ -423,10 +418,9 @@ describe("ERC7984 Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForERC7984();
       const wrapper = createERC7984Wrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }), {
+        wrapper,
+      });
 
       expect(typeof result.current.reset).toBe("function");
     });
@@ -454,10 +448,9 @@ describe("ERC7984 Integration Tests", () => {
       const mockInstance = createMockFhevmInstanceForERC7984();
       const wrapper = createERC7984Wrapper(mockInstance);
 
-      const { result } = renderHook(
-        () => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useUnshield({ wrapperAddress: WRAPPER_ADDRESS }), {
+        wrapper,
+      });
 
       // All phase flags should be false initially
       expect(result.current.isEncrypting).toBe(false);

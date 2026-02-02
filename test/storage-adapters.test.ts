@@ -101,10 +101,7 @@ describe("Storage Adapters", () => {
 
     it("should prefix keys with 'fhevm:'", () => {
       localStorageAdapter.setItem("testKey", "testValue");
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        "fhevm:testKey",
-        "testValue"
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith("fhevm:testKey", "testValue");
     });
 
     it("should get items with prefix", () => {
@@ -149,10 +146,7 @@ describe("Storage Adapters", () => {
 
     it("should prefix keys with 'fhevm:'", () => {
       sessionStorageAdapter.setItem("testKey", "testValue");
-      expect(sessionStorage.setItem).toHaveBeenCalledWith(
-        "fhevm:testKey",
-        "testValue"
-      );
+      expect(sessionStorage.setItem).toHaveBeenCalledWith("fhevm:testKey", "testValue");
     });
 
     it("should get items with prefix", () => {
@@ -217,10 +211,7 @@ describe("Storage Adapters", () => {
     it("should create adapter with custom prefix", () => {
       const customStorage = createLocalStorageAdapter("myapp:");
       customStorage.setItem("testKey", "testValue");
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        "myapp:testKey",
-        "testValue"
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith("myapp:testKey", "testValue");
     });
 
     it("should allow different prefixes for isolation", () => {
@@ -258,10 +249,7 @@ describe("Storage Adapters", () => {
     it("should create adapter with custom prefix", () => {
       const customStorage = createSessionStorageAdapter("myapp:");
       customStorage.setItem("testKey", "testValue");
-      expect(sessionStorage.setItem).toHaveBeenCalledWith(
-        "myapp:testKey",
-        "testValue"
-      );
+      expect(sessionStorage.setItem).toHaveBeenCalledWith("myapp:testKey", "testValue");
     });
   });
 
