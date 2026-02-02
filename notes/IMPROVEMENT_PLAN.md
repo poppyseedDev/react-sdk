@@ -246,9 +246,9 @@ interface TfheParams {
 12. ✅ Phase 6.1 - Security documentation (docs/guides/security.md, storage warning)
 13. ✅ Phase 6.2 - Error handling guide (docs/guides/error-handling.md)
 14. ✅ Phase 6.3 - Migration guide (docs/migration/from-legacy.md)
-15. Phase 1.2 - CDN integrity checking
-16. Phase 4.3 - Memoization improvements (useConfidentialBalances)
-17. Phase 5.3 - FhevmInstance abstraction (adapter interface)
+15. ✅ Phase 1.2 - CDN integrity checking (SRI support, fallback URLs, crossOrigin)
+16. ✅ Phase 4.3 - Memoization improvements (useConfidentialBalances optimized, console.log replaced)
+17. ✅ Phase 5.3 - FhevmInstance abstraction (IFhevmInstanceAdapter interface)
 
 ---
 

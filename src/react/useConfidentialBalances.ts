@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ERC7984_ABI } from "../abi/index";
 import { FhevmDecryptionSignature } from "../FhevmDecryptionSignature";
+import { logger } from "../internal/logger";
 import type {
   BalanceStatus,
   ConfidentialBalanceConfig,
@@ -128,7 +129,7 @@ export function useConfidentialBalances(
             const abi = config.abi ?? ERC7984_ABI;
             const contract = new ethers.Contract(config.contractAddress, abi, provider);
             const result: string = await contract.confidentialBalanceOf(account);
-            console.log("[useConfidentialBalances] confidentialBalanceOf result:", {
+            logger.debug("[useConfidentialBalances]", "confidentialBalanceOf result:", {
               contractAddress: config.contractAddress,
               account,
               result,
@@ -222,16 +223,12 @@ export function useConfidentialBalances(
   } = useUserDecrypt(decryptRequests);
 
   // 3. Read TanStack Query cache for previously decrypted values
+  // Reuse decryptRequests as cacheHandles since they have the same structure
   const cacheHandles = useMemo(() => {
-    if (!autoDecrypt) return undefined;
-    const handles: { handle: string; contractAddress: `0x${string}` }[] = [];
-    data.forEach((item, i) => {
-      if (item.status === "success" && item.result) {
-        handles.push({ handle: item.result, contractAddress: contracts[i].contractAddress });
-      }
-    });
-    return handles.length > 0 ? handles : undefined;
-  }, [autoDecrypt, data, contracts]);
+    if (!autoDecrypt || !decryptRequests) return undefined;
+    // Convert readonly DecryptRequest[] to mutable array for useUserDecryptedValues
+    return decryptRequests.map((r) => ({ handle: r.handle, contractAddress: r.contractAddress }));
+  }, [autoDecrypt, decryptRequests]);
 
   const { values: cachedValues, allCached, cachedCount } = useUserDecryptedValues(cacheHandles);
 

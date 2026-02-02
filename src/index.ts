@@ -63,5 +63,21 @@ export { ERC7984_ABI, ERC20TOERC7984_ABI, ERC20_ABI } from "./abi/index";
 // Logger configuration (for enabling debug mode)
 export { configureLogger, getLoggerConfig } from "./internal/logger";
 
+// FhevmInstance adapter for testing and abstraction
+export {
+  FhevmInstanceAdapter,
+  createFhevmInstanceAdapter,
+  isFhevmInstanceAdapter,
+  type IFhevmInstanceAdapter,
+  type EncryptedInputBuilder,
+  type DecryptionEIP712Data,
+} from "./internal/FhevmInstanceAdapter";
+
+// RelayerSDKLoader for advanced CDN configuration
+export { RelayerSDKLoader, type RelayerSDKLoaderOptions } from "./internal/RelayerSDKLoader";
+
+// Public key storage utilities
+export { getPublicKeyStorageType } from "./internal/PublicKeyStorage";
+
 // React hooks and provider
 export * from "./react/index";

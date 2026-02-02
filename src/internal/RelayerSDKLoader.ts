@@ -1,11 +1,11 @@
-import { SDK_CDN_URL } from "./constants";
+import { SDK_CDN_URL, RELAYER_SDK_INTEGRITY, RELAYER_SDK_FALLBACK_URL } from "./constants";
 import { FhevmRelayerSDKType, FhevmWindowType } from "./fhevmTypes";
 import { logger } from "./logger";
 
 type TraceType = (message?: unknown, ...optionalParams: unknown[]) => void;
 
 /**
- * Options for RetrySDKLoader.
+ * Options for RelayerSDKLoader.
  */
 export interface RelayerSDKLoaderOptions {
   /** Optional trace function for logging */
@@ -16,6 +16,29 @@ export interface RelayerSDKLoaderOptions {
   initialDelay?: number;
   /** Maximum delay in ms between retries (default: 10000) */
   maxDelay?: number;
+  /**
+   * Custom CDN URL for the relayer SDK script.
+   * Defaults to the official Zama CDN.
+   */
+  cdnUrl?: string;
+  /**
+   * Fallback CDN URL to try if the primary CDN fails.
+   * If not provided, no fallback will be attempted.
+   */
+  fallbackUrl?: string;
+  /**
+   * Subresource Integrity (SRI) hash for the script.
+   * Format: "sha384-..." or "sha512-..."
+   * If provided, the script will be verified against this hash.
+   * @see https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+   */
+  integrity?: string;
+  /**
+   * Cross-origin attribute for the script tag.
+   * Required when using SRI with scripts from a different origin.
+   * Defaults to "anonymous" when integrity is provided.
+   */
+  crossOrigin?: "anonymous" | "use-credentials";
 }
 
 /**
@@ -46,12 +69,21 @@ export class RelayerSDKLoader {
   private _maxRetries: number;
   private _initialDelay: number;
   private _maxDelay: number;
+  private _cdnUrl: string;
+  private _fallbackUrl?: string;
+  private _integrity?: string;
+  private _crossOrigin?: "anonymous" | "use-credentials";
 
   constructor(options: RelayerSDKLoaderOptions = {}) {
     this._trace = options.trace;
     this._maxRetries = options.maxRetries ?? 3;
     this._initialDelay = options.initialDelay ?? 1000;
     this._maxDelay = options.maxDelay ?? 10000;
+    this._cdnUrl = options.cdnUrl ?? SDK_CDN_URL;
+    this._fallbackUrl = options.fallbackUrl ?? RELAYER_SDK_FALLBACK_URL;
+    this._integrity = options.integrity ?? RELAYER_SDK_INTEGRITY;
+    // When integrity is provided, crossOrigin must be set for CORS
+    this._crossOrigin = options.crossOrigin ?? (this._integrity ? "anonymous" : undefined);
   }
 
   public isLoaded() {
@@ -64,6 +96,7 @@ export class RelayerSDKLoader {
   /**
    * Load the Relayer SDK with automatic retry on failure.
    * Uses exponential backoff with jitter between retry attempts.
+   * If a fallback URL is configured and the primary CDN fails, it will try the fallback.
    */
   public async load(): Promise<void> {
     logger.debug("[RelayerSDKLoader]", "load...");
@@ -82,6 +115,40 @@ export class RelayerSDKLoader {
       return;
     }
 
+    // Try primary CDN
+    const primaryError = await this._loadWithRetries(this._cdnUrl);
+    if (!primaryError) {
+      return; // Success
+    }
+
+    // Try fallback CDN if available
+    if (this._fallbackUrl) {
+      logger.warn(
+        "[RelayerSDKLoader]",
+        `Primary CDN failed, trying fallback URL: ${this._fallbackUrl}`
+      );
+      const fallbackError = await this._loadWithRetries(this._fallbackUrl);
+      if (!fallbackError) {
+        return; // Success with fallback
+      }
+
+      // Both failed
+      throw new Error(
+        `RelayerSDKLoader: Failed to load Relayer SDK from both primary and fallback CDNs. ` +
+          `Primary error: ${primaryError.message}. Fallback error: ${fallbackError.message}. ` +
+          `Please check your network connection and try again.`
+      );
+    }
+
+    // No fallback, throw primary error
+    throw primaryError;
+  }
+
+  /**
+   * Attempt to load the script from a URL with retries.
+   * @returns Error if all attempts failed, undefined on success.
+   */
+  private async _loadWithRetries(url: string): Promise<Error | undefined> {
     let lastError: Error | undefined;
 
     for (let attempt = 0; attempt <= this._maxRetries; attempt++) {
@@ -95,9 +162,9 @@ export class RelayerSDKLoader {
           await delay(backoffDelay);
         }
 
-        await this._loadScript();
-        logger.debug("[RelayerSDKLoader]", "Successfully loaded Relayer SDK");
-        return;
+        await this._loadScript(url);
+        logger.debug("[RelayerSDKLoader]", `Successfully loaded Relayer SDK from ${url}`);
+        return undefined; // Success
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         logger.warn(
@@ -108,16 +175,14 @@ export class RelayerSDKLoader {
 
         // Remove failed script to allow retry
         if (attempt < this._maxRetries) {
-          this._removeScript();
+          this._removeScript(url);
         }
       }
     }
 
-    // All retries exhausted
-    throw new Error(
-      `RelayerSDKLoader: Failed to load Relayer SDK after ${this._maxRetries + 1} attempts. ` +
-        `Last error: ${lastError?.message ?? "Unknown error"}. ` +
-        `Please check your network connection and try again.`
+    return new Error(
+      `Failed to load Relayer SDK from ${url} after ${this._maxRetries + 1} attempts. ` +
+        `Last error: ${lastError?.message ?? "Unknown error"}.`
     );
   }
 
@@ -125,8 +190,8 @@ export class RelayerSDKLoader {
    * Remove any existing script tag for the SDK.
    * Called before retry to ensure clean state.
    */
-  private _removeScript(): void {
-    const existingScript = document.querySelector(`script[src="${SDK_CDN_URL}"]`);
+  private _removeScript(url: string): void {
+    const existingScript = document.querySelector(`script[src="${url}"]`);
     if (existingScript) {
       existingScript.remove();
     }
@@ -134,10 +199,11 @@ export class RelayerSDKLoader {
 
   /**
    * Internal method to load the script once.
+   * @param url - The URL to load the script from
    */
-  private _loadScript(): Promise<void> {
+  private _loadScript(url: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const existingScript = document.querySelector(`script[src="${SDK_CDN_URL}"]`);
+      const existingScript = document.querySelector(`script[src="${url}"]`);
       if (existingScript) {
         if (!isFhevmWindowType(window, this._trace)) {
           reject(
@@ -150,16 +216,27 @@ export class RelayerSDKLoader {
       }
 
       const script = document.createElement("script");
-      script.src = SDK_CDN_URL;
+      script.src = url;
       script.type = "text/javascript";
       script.async = true;
+
+      // Add Subresource Integrity (SRI) if configured
+      if (this._integrity) {
+        script.integrity = this._integrity;
+        logger.debug("[RelayerSDKLoader]", `Using SRI: ${this._integrity.substring(0, 20)}...`);
+      }
+
+      // Add crossorigin attribute if configured (required for SRI with cross-origin scripts)
+      if (this._crossOrigin) {
+        script.crossOrigin = this._crossOrigin;
+      }
 
       script.onload = () => {
         if (!isFhevmWindowType(window, this._trace)) {
           logger.debug("[RelayerSDKLoader]", "script onload FAILED - invalid relayerSDK object");
           reject(
             new Error(
-              `RelayerSDKLoader: Relayer SDK script has been successfully loaded from ${SDK_CDN_URL}, however, the window.relayerSDK object is invalid.`
+              `RelayerSDKLoader: Relayer SDK script has been successfully loaded from ${url}, however, the window.relayerSDK object is invalid.`
             )
           );
           return;
@@ -167,12 +244,18 @@ export class RelayerSDKLoader {
         resolve();
       };
 
-      script.onerror = () => {
-        logger.debug("[RelayerSDKLoader]", "script onerror");
-        reject(new Error(`RelayerSDKLoader: Failed to load Relayer SDK from ${SDK_CDN_URL}`));
+      script.onerror = (event) => {
+        logger.debug("[RelayerSDKLoader]", "script onerror", event);
+        // Provide more specific error messages
+        let errorMessage = `RelayerSDKLoader: Failed to load Relayer SDK from ${url}`;
+        if (this._integrity) {
+          errorMessage +=
+            ". This may be due to an SRI hash mismatch - verify the integrity hash matches the script content.";
+        }
+        reject(new Error(errorMessage));
       };
 
-      logger.debug("[RelayerSDKLoader]", "adding script to DOM...");
+      logger.debug("[RelayerSDKLoader]", `adding script to DOM: ${url}`);
       document.head.appendChild(script);
       logger.debug("[RelayerSDKLoader]", "script added!");
     });
