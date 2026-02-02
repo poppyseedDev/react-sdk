@@ -30,6 +30,11 @@
 * [useEthersSigner](hooks/use-ethers-signer.md)
 * [useUserDecryptedValue](hooks/use-user-decrypted-value.md)
 
+## Guides
+
+* [Security](guides/security.md)
+* [Error Handling](guides/error-handling.md)
+
 ## Reference
 
 * [Types](types/overview.md)

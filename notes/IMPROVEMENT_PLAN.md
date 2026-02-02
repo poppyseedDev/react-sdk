@@ -243,9 +243,12 @@ interface TfheParams {
 9. ✅ Phase 4.2 - Console logging cleanup (created logger utility, replaced ~40 console calls)
 10. ✅ Phase 5.1 - Deprecate legacy API (added @deprecated tags and one-time warnings)
 11. ✅ Phase 5.2 - Storage fallback chain (IndexedDB → memory with logging)
-12. Phase 1.2 - CDN integrity checking
-13. Phase 4.3 - Memoization improvements (useConfidentialBalances)
-14. Phase 5.3 - FhevmInstance abstraction (adapter interface)
+12. ✅ Phase 6.1 - Security documentation (docs/guides/security.md, storage warning)
+13. ✅ Phase 6.2 - Error handling guide (docs/guides/error-handling.md)
+14. ✅ Phase 6.3 - Migration guide (docs/migration/from-legacy.md)
+15. Phase 1.2 - CDN integrity checking
+16. Phase 4.3 - Memoization improvements (useConfidentialBalances)
+17. Phase 5.3 - FhevmInstance abstraction (adapter interface)
 
 ---
 
