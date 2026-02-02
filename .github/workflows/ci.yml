@@ -58,7 +58,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        # Node 18 has ESM compatibility issues with jsdom 27
+        node-version: [20.x, 22.x]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -167,8 +168,12 @@ jobs:
           find dist -name "*.d.ts" | head -10
           test $(find dist -name "*.d.ts" | wc -l) -gt 0 && echo "✓ Type declarations found"
 
-      - name: Pack dry run
-        run: pnpm pack --dry-run
+      - name: Verify package contents
+        run: |
+          # List what would be published
+          pnpm pack
+          tar -tzf *.tgz | head -30
+          rm -f *.tgz
 
   # ===========================================================================
   # Coverage Summary
