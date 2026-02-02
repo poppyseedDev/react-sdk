@@ -2,7 +2,7 @@
  * Relayer SDK version locked in the fhevm-sdk.
  * Users don't need to manage this - it's handled internally.
  */
-export const RELAYER_SDK_VERSION = "0.4.0-4";
+export const RELAYER_SDK_VERSION = "0.4.0";
 
 /**
  * CDN URL for the relayer SDK script.
